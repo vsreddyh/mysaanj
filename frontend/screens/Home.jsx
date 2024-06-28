@@ -1,9 +1,8 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Text, View, TouchableOpacity, TextInput,BackHandler,Alert } from "react-native";
-import doctorExplanation from "../components/doctorExplanation";
 
-export default function Login() {
+export default function Home() {
   useEffect(() => {
     const backAction = () => {
       Alert.alert('Hold on!', 'Are you sure you want to go back?', [
@@ -25,7 +24,7 @@ export default function Login() {
     return
   })
   return (
-    <View>
+    <View classname="w-screen h-screen">
 
     </View>
   );
