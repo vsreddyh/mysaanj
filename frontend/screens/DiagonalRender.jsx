@@ -1,8 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import { Animated, Image, View, Text } from 'react-native';
+import { Animated,View,Dimensions } from 'react-native';
+const { width, height } = Dimensions.get('window');
 
 function DiagonalRender({ navigation }) {
   const imageRef = useRef(null);
+  const positionY = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(0)).current;
   const fadeValue = useRef(new Animated.Value(0)).current;
 
@@ -20,15 +22,15 @@ function DiagonalRender({ navigation }) {
           useNativeDriver: true,
         }),
       ]),
-      Animated.delay(800),
+      Animated.delay(400),
       Animated.parallel([
         Animated.timing(scaleValue, {
-          toValue: 0,
+          toValue: 0.5,
           duration: 800,
           useNativeDriver: true,
         }),
-        Animated.timing(fadeValue, {
-          toValue: 0,
+        Animated.timing(positionY, {
+          toValue: -0.76*height,
           duration: 800,
           useNativeDriver: true,
         }),
@@ -51,7 +53,9 @@ function DiagonalRender({ navigation }) {
             height: '70%',
             resizeMode: 'contain',
             opacity: fadeValue,
-            transform: [{ scale: scaleValue }],
+            transform: [{ scale: scaleValue },
+              { translateY: positionY }
+            ],
           },
         ]}
       />
