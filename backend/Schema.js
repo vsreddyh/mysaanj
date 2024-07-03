@@ -6,6 +6,7 @@ patientSchema = new mongoose.Schema({
     DOB:Date,
     gender: String,
     chronics:Array,//Chronical diseases like diabetes,BP
+    Medications:String,
     phone:Number,
     reportsList:Array,//latest report is at 0 index
     weight:Number,
@@ -47,4 +48,4 @@ const report = mongoose.model('report', reportSchema);
 const oldAgeHome = mongoose.model('oldAgeHome', oldAgeHomeSchema);
 const doctor = mongoose.model('doctor', doctorSchema);
 
-module.exports = { patient, report , oldAgeHome, doctor,careTaker}
+module.exports = { patient, report , oldAgeHome, doctor}

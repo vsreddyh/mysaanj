@@ -120,7 +120,6 @@ const uploadReport = async (req,res) => {
         });
         const dataBuffer = fs.readFileSync('../test.pdf');
         const data = await pdf(dataBuffer);
-
         const result = await chatSession.sendMessage(
             'the below information will provide you a data of test report file , fetch the parameters as json object and If data is not related to medical diagnosis must respond with only {\n"medicalQuery":"no"\n} \n' +
                 data.text
