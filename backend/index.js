@@ -40,7 +40,9 @@ app.use(
         },
     })
 );
-
+app.get('/welcome', (req, res) => {
+    res.json('Hello World!');
+});
 app.use('/en', approute);
 
 app.listen(port, () => {
