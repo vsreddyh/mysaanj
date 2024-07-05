@@ -40,7 +40,7 @@ app.use(
         },
     })
 );
-app.get('/welcome', (req, res) => {
+app.get('/', (req, res) => {
     res.json('Hello World!');
 });
 app.use('/en', approute);
