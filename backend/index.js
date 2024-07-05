@@ -46,6 +46,9 @@ app.use(
 app.get('/', (req, res) => {
     res.json('Hello World!');
 });
+app.get('/welcome', (req, res) => {
+    res.json('Hell');
+});
 app.use('/en', approute);
 
 app.listen(port, () => {
