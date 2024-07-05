@@ -10,15 +10,14 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 require('dotenv').config();
 
 const port = process.env.PORT||3000;
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(express.json());
-app.use(cors({
-    origin: ['http://localhost:3000',"exp://0ee2vv8-anonymous-8081.exp.direct","http://localhost:8081","https://mysaanj.vercel.app"],
-    credentials: true
-}));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const uri = process.env.MONGO_URL;
-mongoose.connect(uri);
+mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('MongoDB database connection established successfully');
@@ -26,6 +25,8 @@ connection.once('open', () => {
 var store = new MongoDBStore({
     uri: uri,
     collection: 'mySessions',
+    autoRemove: 'native',
+    ttl: 14 * 24 * 60 * 60
 });
 app.set("trust proxy", 1);
 app.use(
@@ -37,8 +38,8 @@ app.use(
         cookie: {
             sameSite:"strict",
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 6 * 60 * 60 * 1000, //6 hours
+            secure: isProduction,
+            maxAge: 14 * 24 * 60 * 60 * 1000, //14 days
             rolling: true, //whenever session is modified it resets expirytime
         },
     })
