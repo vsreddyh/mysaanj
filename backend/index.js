@@ -11,7 +11,10 @@ require('dotenv').config();
 
 const port = process.env.PORT||3000;
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000',"exp://0ee2vv8-anonymous-8081.exp.direct","http://localhost:8081","https://mysaanj.vercel.app"],
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const uri = process.env.MONGO_URL;
