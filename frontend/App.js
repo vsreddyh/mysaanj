@@ -1,12 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { Text, View,BackHandler,Alert} from 'react-native';
+import { Text, View, BackHandler, Alert,StatusBar } from 'react-native';
 import Home from './screens/Home';
 import { useEffect } from 'react';
-import Frontpage from './screens/Frontpage';
 import DiagonalRender from './screens/DiagonalRender';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Caretaker from './screens/Caretaker';
 import { NativeWindStyleSheet } from 'nativewind';
+import CreatePatient from './screens/CreatePatient';
 NativeWindStyleSheet.setOutput({
     default: 'native',
 });
@@ -18,6 +18,8 @@ export default function App() {
             screens: {
                 SplashScreen: '',
                 Home: '/home',
+                Caretaker: '/caretaker',
+                CreatePatient:"/createpatient"
             },
         },
     };
@@ -43,9 +45,16 @@ export default function App() {
     });
     return (
         <NavigationContainer linking={linking}>
-            <Stack.Navigator screenOptions={{ headerShown: false }} >
-                <Stack.Screen name='SplashScreen' component={DiagonalRender}/>
-                <Stack.Screen name="Home" component={Home} options={{ animation: 'none' }}/>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name='SplashScreen' component={DiagonalRender} />
+                <Stack.Screen
+                    name='Home'
+                    component={Home}
+                    options={{ animation: 'none' }}
+                />
+                <Stack.Screen name='Caretaker' component={Caretaker} options={{animation:'none'}}/>
+                <Stack.Screen name='CreatePatient' component={CreatePatient} options={{animation:'none'}}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

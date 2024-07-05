@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import Count from '../components/Count';
 import {
     Text,
     ScrollView,
@@ -11,7 +12,7 @@ import {
 import axios from 'axios';
 const { width, height } = Dimensions.get('window');
 
-export default function Home() {
+export default function Home({navigation}) {
     const [count, setCount] = useState(null);
 
     useEffect(() => {
@@ -27,11 +28,11 @@ export default function Home() {
     }, []);
     return (
         <ScrollView
-            contentContainerStyle={{ flex: 1, alignItems: 'center' }}
+            contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
             className='w-screen'
         >
             <Image
-                className='h-[23%] w-[35%] relative top-[1%]'
+                className='h-[23vh] w-[35%] relative top-[1.5%]'
                 source={require('../assets/loader.png')}
                 style={[
                     {
@@ -40,7 +41,7 @@ export default function Home() {
                 ]}
             />
             <Text className='text-2xl my-8'>Choose Your Role?</Text>
-            <TouchableOpacity className='w-[77%] h-[15%] flex-row bg-zinc-300 mb-8 rounded-2xl'>
+            <TouchableOpacity className='w-[77%] h-[20vh] flex-row bg-zinc-300 mb-8 rounded-2xl' onPress={() => navigation.navigate('Caretaker')} >
                 <View className=' w-full h-full flex-row bg-zinc-300 rounded-2xl'>
                     <View className='flex items-center w-[35%]'>
                         <Image
@@ -63,12 +64,12 @@ export default function Home() {
                     </View>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity className='w-[77%] h-[15%] flex-row bg-zinc-300 mb-16 rounded-2xl'>
+            <TouchableOpacity className='w-[77%] h-[20vh] flex-row bg-zinc-300 mb-16 rounded-2xl'>
                 <View className='w-full h-full flex-row bg-zinc-300 rounded-2xl'>
                     <View className='flex items-center w-[35%]'>
                         <Image
                             className='w-[80%] h-full'
-                            source={require('../assets/oldAgeHome.png')}
+                            source={require('../assets/Doctor.png')}
                             style={[
                                 {
                                     resizeMode: 'contain',
@@ -85,20 +86,7 @@ export default function Home() {
                     </View>
                 </View>
             </TouchableOpacity>
-            {count && <View className='w-[77%] h-[15%] rounded-md flex justify-around bg-zinc-300 mb-16'>
-                <View className='flex-row justify-around'>
-                    <Text>No of doctors:-{count.dcount}</Text>
-                    <Text>No of caretakers:-{count.ccount}</Text>
-                </View>
-                <View className='flex-row justify-around'>
-                    <Text>No of patients:-{count.pcount}</Text>
-                </View>
-                <View className='flex-row justify-around'>
-                    <Text>No of reports:-{count.rcount}</Text>
-                </View>
-            </View>
-            }
-            
+            {count && <Count count={count}/>}            
         </ScrollView>
     );
 }

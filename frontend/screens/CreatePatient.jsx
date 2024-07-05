@@ -1,11 +1,12 @@
 import { ScrollView, DrawerLayoutAndroid, Dimensions } from 'react-native';
-import { useRef, useState } from 'react';
-import Searchbar1 from '../components/Searchbar1';
-import PatientCard from '../components/PatientCard';
+import { useRef } from 'react';
 import Chatbot from '../components/Chatbot';
+import Searchbar2 from '../components/Searchbar2';
 import CSidebar from '../components/Sidebar';
+import PatientForm from '../components/PatientForm';
 const { width, height } = Dimensions.get('window');
-export default function Caretaker({ navigation }) {
+
+export default function CreatePatient({ navigation }) {
     const drawer = useRef(null);
     return (
         <DrawerLayoutAndroid
@@ -14,25 +15,14 @@ export default function Caretaker({ navigation }) {
             drawerPosition={'left'}
             renderNavigationView={() => <CSidebar drawer={drawer} />}
         >
-            <Searchbar1 drawer={drawer} navigation={navigation} />
+            <Searchbar2 drawer={drawer} navigation={navigation} />
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
                 className='w-screen'
                 scrollEnabled={true}
                 nestedScrollEnabled={true}
             >
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
+                <PatientForm />
             </ScrollView>
             <Chatbot />
         </DrawerLayoutAndroid>
