@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
 const approute = require('./route');
 const session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
@@ -17,15 +16,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const uri = process.env.MONGO_URL;
-mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
-const connection = mongoose.connection;
-connection.once('open', () => {
-    console.log('MongoDB database connection established successfully');
-});
+mongoose.connect(uri);
 var store = new MongoDBStore({
     uri: uri,
     collection: 'mySessions',
-    autoRemove: 'native',
     ttl: 14 * 24 * 60 * 60
 });
 app.set("trust proxy", 1);
@@ -36,7 +30,6 @@ app.use(
         store: store,
         saveUninitialized: false,
         cookie: {
-            sameSite:"strict",
             httpOnly: true,
             secure: isProduction,
             maxAge: 14 * 24 * 60 * 60 * 1000, //14 days

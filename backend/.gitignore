@@ -35,4 +35,4 @@ out/
 
 # All of .svn for svn
 .svn/
-# TODO need to add .env here
+.env
