@@ -37,9 +37,9 @@ const getReports = async (req, res) => {
 
 const setPatient = async (req, res) => {
     try {
-        const oid = req.session.id;
+        let oid = req.session.oldageid;
         const oldAgeHomeInfo = await oldAgeHome.findOne({ _id: oid });
-        const info = req.body.info;
+        const info= req.body
         let newpatient = new patient({
             name: info.name,
             DOB: info.date,
