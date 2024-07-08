@@ -5,7 +5,12 @@ const logincaretaker = (req, res) => {
     res.json({id:"6687cc90dfb46fdd2abb5006",name:"Vishnu",type:"Caretaker",type:"Caretaker"})
 }
 const checksession = (req, res) => {
-    res.json({id:req.session.id,name:req.session.name,type:req.session.type})
+    if(req.session.type){
+        res.json({id:req.session.id,name:req.session.name,type:req.session.type})
+    }
+    else{
+        res.json(null)
+    }
 }
 module.exports = {
     logincaretaker,
