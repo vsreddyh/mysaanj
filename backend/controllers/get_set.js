@@ -41,6 +41,8 @@ const getReports= async (req, res) => {
 }
 
 const setPatient = async (req,res)=>{
+    const oid=req.session.id;
+    const oldAgeHomeInfo = await oldAgeHome.findOne({ _id: oid });
     const info = req.body.info;
     let newpatient = new patient({
         name:info.name,
@@ -48,7 +50,7 @@ const setPatient = async (req,res)=>{
         chronics:info.chronics,
         bloodGroup:info.bloodGroup,
         gender:info.gender,
-        phone:info.phone,
+        phone:oldAgeHomeInfo.contact,
         weight:info.weight,
     })
     newpatient = await newpatient.save();
