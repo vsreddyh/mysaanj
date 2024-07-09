@@ -66,9 +66,10 @@ const getPatient = async (req, res) => {
 };
 
 const getPatients = async (req, res) => {
+    const id=req.params.id;
     try {
-        const patients = await oldAgeHome.findOne().select('patients'); // TODO: add session oldagehome query
-        res.json(patients);
+        const patients = await oldAgeHome.findOne({_id:id}).select('patients'); // TODO: add session oldagehome query
+        res.json(patients.patients);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to retrieve patients' });

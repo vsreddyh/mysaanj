@@ -5,18 +5,20 @@ patientSchema = new mongoose.Schema({
     name: String,
     DOB:Date,
     gender: String,
-    chronics:Array,//Chronical diseases like diabetes,BP
+    chronics:String,//Chronical diseases like diabetes,BP
     Medications:String,
     phone:Number,
-    reportsList:Array,//latest report is at 0 index
     weight:Number,
     bloodGroup:String,
+    verifiedreports:Array,
+    unverifiedreports:Array
 })
 oldAgeHomeSchema=new mongoose.Schema({
     name:String,
     email:String,
     password:String,
     doctors:Array,
+    key:String,
     patients:Array,
     address:String,
     contact:Number,

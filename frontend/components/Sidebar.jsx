@@ -6,7 +6,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
 } from 'react-native';
-export default function CSidebar({ drawer }) {
+export default function CSidebar({ drawer,cdetails }) {
     const [dropdown, setDropdown] = useState(false);
     return (
         <View>
