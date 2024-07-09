@@ -78,8 +78,8 @@ const getPatients = async (req, res) => {
 
 const getOldageHomeInfo = async (req, res) => {
     try {
-        const name = req.params.name;
-        const oldAgeHomeDetails = await oldAgeHome.findOne(); // TODO: add session oldagehome query
+        const id = req.params.id;
+        const oldAgeHomeDetails = await oldAgeHome.findOne({_id:id}).select({"key":1,"doctors":1});
         res.json(oldAgeHomeDetails);
     } catch (error) {
         console.error(error);

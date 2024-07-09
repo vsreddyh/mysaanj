@@ -15,7 +15,7 @@ export default function Caretaker({ navigation }) {
     //         const response=await axios.get("https://mysaanj.vercel.app/en/checksession");
     //         setcdetails(response.data);
     //         const response1=await axios.get(`https://mysaanj.vercel.app/en/getpatients/id=${response.data}`);
-    //          setlist(response1.data);
+    //         setlist(response1.data); 
     //     }
     //     getcurr()
     // },[])
