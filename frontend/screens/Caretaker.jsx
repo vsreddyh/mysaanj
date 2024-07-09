@@ -5,8 +5,10 @@ import PatientCard from '../components/PatientCard';
 import Chatbot from '../components/Chatbot';
 import CSidebar from '../components/Sidebar';
 const { width, height } = Dimensions.get('window');
+import axios from "axios"
 export default function Caretaker({ navigation }) {
     const drawer = useRef(null);
+    const [list,setlist]=useState(null)
     return (
         <DrawerLayoutAndroid
             ref={drawer}
@@ -21,17 +23,6 @@ export default function Caretaker({ navigation }) {
                 scrollEnabled={true}
                 nestedScrollEnabled={true}
             >
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
-                <PatientCard />
                 <PatientCard />
             </ScrollView>
             <Chatbot />

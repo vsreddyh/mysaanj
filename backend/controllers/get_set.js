@@ -50,6 +50,8 @@ const setPatient = async (req, res) => {
             weight: info.weight,
         });
         newpatient = await newpatient.save();
+        oldAgeHomeInfo.patients.push(newpatient._id)
+        oldAgeHomeInfo.save();
         res.json(newpatient._id);
     } catch (error) {
         console.error(error);

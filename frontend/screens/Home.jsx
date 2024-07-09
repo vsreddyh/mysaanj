@@ -12,13 +12,20 @@ import {
 import axios from 'axios';
 const { width, height } = Dimensions.get('window');
 
-export default function Home({navigation}) {
+export default function Home({ navigation }) {
     const [count, setCount] = useState(null);
-
+    async function Authenticate() {
+        const response = await axios.post(
+            'https://mysaanj.vercel.app/en/logincaretaker'
+        );
+        navigation.navigate('Caretaker');
+    }
     useEffect(() => {
         const getCount = async () => {
             try {
-                const response = await axios.get('http://192.168.43.1:3000/en/count');
+                const response = await axios.get(
+                    'https://mysaanj.vercel.app/en/count'
+                );
                 setCount(response.data);
             } catch (error) {
                 console.log(error);
@@ -41,7 +48,10 @@ export default function Home({navigation}) {
                 ]}
             />
             <Text className='text-2xl my-8'>Choose Your Role?</Text>
-            <TouchableOpacity className='w-[77%] h-[20vh] flex-row bg-zinc-300 mb-8 rounded-2xl' onPress={() => navigation.navigate('Caretaker')} >
+            <TouchableOpacity
+                className='w-[77%] h-[20vh] flex-row bg-zinc-300 mb-8 rounded-2xl'
+                onPress={() => Authenticate()}
+            >
                 <View className=' w-full h-full flex-row bg-zinc-300 rounded-2xl'>
                     <View className='flex items-center w-[35%]'>
                         <Image
@@ -57,7 +67,6 @@ export default function Home({navigation}) {
                     <View className='flex w-[65%] items-center mt-1'>
                         <Text className='text-2xl font-medium'>Caretaker</Text>
                         <Text>
-                            {' '}
                             I provide companionship, assistance, and ensure the
                             well-being of our valued residents.
                         </Text>
@@ -86,7 +95,7 @@ export default function Home({navigation}) {
                     </View>
                 </View>
             </TouchableOpacity>
-            {count && <Count count={count}/>}            
+            {count && <Count count={count} />}
         </ScrollView>
     );
 }

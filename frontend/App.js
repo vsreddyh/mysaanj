@@ -1,4 +1,4 @@
-import { Text, View, BackHandler, Alert,StatusBar } from 'react-native';
+import { BackHandler, Alert, StatusBar } from 'react-native';
 import Home from './screens/Home';
 import { useEffect } from 'react';
 import DiagonalRender from './screens/DiagonalRender';
@@ -19,7 +19,7 @@ export default function App() {
                 SplashScreen: '',
                 Home: '/home',
                 Caretaker: '/caretaker',
-                CreatePatient:"/createpatient"
+                CreatePatient: '/createpatient',
             },
         },
     };
@@ -45,7 +45,7 @@ export default function App() {
     });
     return (
         <NavigationContainer linking={linking}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <StatusBar barStyle='light-content' backgroundColor='#000' />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name='SplashScreen' component={DiagonalRender} />
                 <Stack.Screen
@@ -53,8 +53,16 @@ export default function App() {
                     component={Home}
                     options={{ animation: 'none' }}
                 />
-                <Stack.Screen name='Caretaker' component={Caretaker} options={{animation:'none'}}/>
-                <Stack.Screen name='CreatePatient' component={CreatePatient} options={{animation:'none'}}/>
+                <Stack.Screen
+                    name='Caretaker'
+                    component={Caretaker}
+                    options={{ animation: 'none' }}
+                />
+                <Stack.Screen
+                    name='CreatePatient'
+                    component={CreatePatient}
+                    options={{ animation: 'none' }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
