@@ -40,9 +40,11 @@ const setPatient = async (req, res) => {
         let oid = req.session.oldageid;
         const oldAgeHomeInfo = await oldAgeHome.findOne({ _id: oid });
         const info= req.body
+        info.DOB=new Date(info.DOB);
+        console.log("a",info.DOB,typeof(info.DOB))
         let newpatient = new patient({
             name: info.name,
-            DOB: info.date,
+            DOB: info.DOB,
             chronics: info.chronics,
             bloodGroup: info.bloodGroup,
             gender: info.gender,
@@ -60,15 +62,14 @@ const setPatient = async (req, res) => {
 };
 
 const getPatient = async (req, res) => {
-    const id = req.params.id;
+    const id = req.query.id;
     const patientInfo = await patient.findOne({ _id: id });
     res.json(patientInfo);
 };
 
 const getPatients = async (req, res) => {
-    const id=req.params.id;
     try {
-        const patients = await oldAgeHome.findOne({_id:id}).select('patients'); // TODO: add session oldagehome query
+        const patients = await oldAgeHome.findOne({_id:req.session.oldageid}).select('patients'); // TODO: add session oldagehome query
         res.json(patients.patients);
     } catch (error) {
         console.error(error);
@@ -78,7 +79,8 @@ const getPatients = async (req, res) => {
 
 const getOldageHomeInfo = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.query.id;
+        console.log(id)
         const oldAgeHomeDetails = await oldAgeHome.findOne({_id:id}).select({"key":1,"doctors":1});
         res.json(oldAgeHomeDetails);
     } catch (error) {

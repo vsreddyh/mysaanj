@@ -14,9 +14,8 @@ function DiagonalRender({ navigation }) {
         async function find() {
             try {
                 const response = await axios.get(
-                    'https://mysaanj.vercel.app/en/checksession'
+                    'http://192.168.147.1:3000/en/checksession'
                 );
-                console.log(response.data);
                 if (response.data && response.data.type !== 'Home') {
                     usrdata = response.data;
                 }
@@ -38,27 +37,22 @@ function DiagonalRender({ navigation }) {
                 }),
             ]),
             Animated.delay(400),
-            ...(usrdata.type === 'Home'
-                ? [
-                      Animated.parallel([
-                          Animated.timing(scaleValue, {
-                              toValue: 0.5,
-                              duration: 800,
-                              useNativeDriver: true,
-                          }),
-                          Animated.timing(positionY, {
-                              toValue: -0.76 * height,
-                              duration: 800,
-                              useNativeDriver: true,
-                          }),
-                      ]),
-                  ]
-                : []),
+            Animated.parallel([
+                Animated.timing(scaleValue, {
+                    toValue: 0.5,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(positionY, {
+                    toValue: -0.76 * height,
+                    duration: 800,
+                    useNativeDriver: true,
+                }),
+            ]),
         ]);
         async function start() {
             await find();
             zoomIn.start(() => {
-                console.log(usrdata);
                 navigation.navigate(usrdata.type);
             });
         }

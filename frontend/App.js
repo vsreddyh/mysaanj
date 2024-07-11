@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Caretaker from './screens/Caretaker';
 import { NativeWindStyleSheet } from 'nativewind';
 import CreatePatient from './screens/CreatePatient';
+import Patient from './screens/Patient';
 NativeWindStyleSheet.setOutput({
     default: 'native',
 });
@@ -20,6 +21,7 @@ export default function App() {
                 Home: '/home',
                 Caretaker: '/caretaker',
                 CreatePatient: '/createpatient',
+                Patient:"/patient"
             },
         },
     };
@@ -47,6 +49,7 @@ export default function App() {
         <NavigationContainer linking={linking}>
             <StatusBar barStyle='light-content' backgroundColor='#000' />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Patient" component={Patient}/>
                 <Stack.Screen name='SplashScreen' component={DiagonalRender} />
                 <Stack.Screen
                     name='Home'

@@ -16,7 +16,7 @@ export default function Home({ navigation }) {
     const [count, setCount] = useState(null);
     async function Authenticate() {
         const response = await axios.post(
-            'https://mysaanj.vercel.app/en/logincaretaker'
+            'http://192.168.147.1:3000/en/logincaretaker'
         );
         navigation.navigate('Caretaker');
     }
@@ -24,7 +24,7 @@ export default function Home({ navigation }) {
         const getCount = async () => {
             try {
                 const response = await axios.get(
-                    'https://mysaanj.vercel.app/en/count'
+                    'http://192.168.147.1:3000/en/count'
                 );
                 setCount(response.data);
             } catch (error) {

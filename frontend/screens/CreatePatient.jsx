@@ -24,25 +24,21 @@ export default function CreatePatient({ navigation }) {
         if (save && ok) {
             try {
                 const savepatient = async () => {
-                    console.log('running');
                     const response = await axios.post(
-                        'https://mysaanj.vercel.app/en/setPatient',
+                        'http://192.168.147.1:3000/en/setPatient',
                         info
                     );
-                    console.log(response.data);
                     return response.data;
                 };
                 setsave(false);
                 setok(false);
                 let a = savepatient();
-                console.log(a);
             } catch (error) {
                 console.log(error);
             }
             navigation.navigate('Caretaker');
         }
     }, [save, ok]);
-    console.log(save, ok, 4);
     return (
         <DrawerLayoutAndroid
             ref={drawer}

@@ -14,12 +14,10 @@ export default function PatientForm({ setinfo, save, setsave, info, setok }) {
     const [date, setDate] = useState(new Date());
     const [open, setOpen] = useState(false);
     const [formatDate, setFormatDate] = useState('');
-    const currentDate = new Date();
     useEffect(() => {
         if (save) {
             if (info.name && info.name.length > 3) {
-                console.log('name ok');
-                if (currentDate.getFullYear() - info.DOB.getFullYear() > 40) {
+                if (date.getFullYear() - info.DOB.getFullYear() > 40) {
                     if (info.chronics == null) {
                         setinfo((prevData) => ({
                             ...prevData,
@@ -37,10 +35,8 @@ export default function PatientForm({ setinfo, save, setsave, info, setok }) {
                         !isNaN(info.weight) &&
                         parseInt(info.weight) > 15
                     ) {
-                        console.log('ok');
                         setok(true);
                     } else {
-                        console.log(info.weight);
                         ToastAndroid.show(
                             'Weight should be a number and greater than 15',
                             ToastAndroid.SHORT
@@ -60,7 +56,6 @@ export default function PatientForm({ setinfo, save, setsave, info, setok }) {
                     ToastAndroid.SHORT
                 );
                 setsave(false);
-                console.log(1,info)
             }
         }
     }, [save]);
@@ -113,11 +108,11 @@ export default function PatientForm({ setinfo, save, setsave, info, setok }) {
                             display='calender'
                             value={date}
                             onChange={(event, selectedDate) => {
-                                const currentDate = selectedDate || date;
+                                console.log(selectedDate,typeof(new Date(selectedDate)))
                                 setOpen(false);
                                 setinfo((prevData) => ({
                                     ...prevData,
-                                    DOB: currentDate,
+                                    DOB: selectedDate,
                                 }));
                             }}
                         />
