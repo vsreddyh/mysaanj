@@ -14,7 +14,7 @@ function DiagonalRender({ navigation }) {
         async function find() {
             try {
                 const response = await axios.get(
-                    'http://192.168.147.1:3000/en/checksession'
+                    'http://192.168.29.80:3000/en/checksession'
                 );
                 if (response.data && response.data.type !== 'Home') {
                     usrdata = response.data;

@@ -7,21 +7,32 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 import axios from 'axios';
-export default function CSidebar({ drawer, cdetails }) {
+export default function CSidebar({ drawer, navigation }) {
     const [dropdown, setDropdown] = useState(false);
     const [caretaker, setcaretaker] = useState(null);
+    const [cdetails, setcdetails] = useState(null);
     useEffect(() => {
         async function x() {
-            const f = cdetails.oldageid;
-            console.log(f);
+            const response1 = await axios.get(
+                'http://192.168.29.80:3000/en/checksession'
+            );
+            setcdetails(response1.data);
             const response = await axios.get(
-                `http://192.168.147.1:3000/en/getoldagehomeinfo?id=${f}`
+                `http://192.168.29.80:3000/en/getoldagehomeinfo?id=${response1.data.oldageid}`
             );
             console.log(response.data);
             setcaretaker(response.data);
         }
         x();
     }, []);
+    async function logout() {
+        response = await axios.post(
+            'http://192.168.29.80:3000/en/deletesession'
+        );
+        if (response.data === true) {
+            navigation.navigate('Home');
+        }
+    }
     return (
         caretaker &&
         cdetails && (
@@ -90,7 +101,10 @@ export default function CSidebar({ drawer, cdetails }) {
                         {dropdown && caretaker && (
                             <View className='flex h-fit ml-6 w-full'>
                                 {caretaker.doctors.map((doctor) => {
-                                    <View className='flex-row items-center h-fit w-[90%]'>
+                                    <View
+                                        key={index}
+                                        className='flex-row items-center h-fit w-[90%]'
+                                    >
                                         <Text className='text-base text-white'>
                                             {doctor.name}
                                         </Text>
@@ -124,7 +138,10 @@ export default function CSidebar({ drawer, cdetails }) {
                                 Feedback
                             </Text>
                         </View>
-                        <View className='flex-row p-2 items-center h-[7%] w-full'>
+                        <TouchableOpacity
+                            className='flex-row p-2 items-center h-[7%] w-full'
+                            onPress={logout}
+                        >
                             <View className='h-[100%] w-[10%]'>
                                 <Image
                                     source={require('../assets/logout.png')}
@@ -134,7 +151,7 @@ export default function CSidebar({ drawer, cdetails }) {
                             <Text className='text-base pl-1 text-white'>
                                 Logout
                             </Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>

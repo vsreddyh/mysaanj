@@ -128,9 +128,8 @@ export default function PatientForm({ setinfo, save, setsave, info, setok }) {
                             }))
                         }
                     >
-                        <Picker.Item label='Male' value='male' />
-                        <Picker.Item label='Female' value='female' />
-                        <Picker.Item label='Other' value='other' />
+                        <Picker.Item label='Male' value='M' />
+                        <Picker.Item label='Female' value='F' />
                     </Picker>
                 </View>
             </View>

@@ -8,6 +8,9 @@ import Caretaker from './screens/Caretaker';
 import { NativeWindStyleSheet } from 'nativewind';
 import CreatePatient from './screens/CreatePatient';
 import Patient from './screens/Patient';
+import NewReport from './screens/addReport';
+import Report from './screens/Report';
+import Doctor from './screens/Doctor';
 NativeWindStyleSheet.setOutput({
     default: 'native',
 });
@@ -21,7 +24,9 @@ export default function App() {
                 Home: '/home',
                 Caretaker: '/caretaker',
                 CreatePatient: '/createpatient',
-                Patient:"/patient"
+                Patient: '/patient',
+                NewReport: '/newreport',
+                Report: '/report',
             },
         },
     };
@@ -49,7 +54,6 @@ export default function App() {
         <NavigationContainer linking={linking}>
             <StatusBar barStyle='light-content' backgroundColor='#000' />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Patient" component={Patient}/>
                 <Stack.Screen name='SplashScreen' component={DiagonalRender} />
                 <Stack.Screen
                     name='Home'
@@ -66,6 +70,22 @@ export default function App() {
                     component={CreatePatient}
                     options={{ animation: 'none' }}
                 />
+                <Stack.Screen
+                    name='Patient'
+                    component={Patient}
+                    options={{ animation: 'none' }}
+                />
+                <Stack.Screen
+                    name='NewReport'
+                    component={NewReport}
+                    options={{ animation: 'none' }}
+                />
+                <Stack.Screen
+                    name='Doctor'
+                    component={Doctor}
+                    options={{ animation: 'none' }}
+                />
+                <Stack.Screen name='Report' component={Report} />
             </Stack.Navigator>
         </NavigationContainer>
     );

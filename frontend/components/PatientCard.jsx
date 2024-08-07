@@ -1,14 +1,14 @@
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-export default function PatientCard({ patientinfo }) {
+export default function PatientCard({ patientinfo, navigation }) {
     const [totinfo, settotinfo] = useState(null);
     const [age, setage] = useState(null);
     const [a, seta] = useState(new Date());
     useEffect(() => {
         async function x() {
             const response = await axios.get(
-                `http://192.168.147.1:3000/en/getpatient?id=${patientinfo}`
+                `http://192.168.29.80:3000/en/getpatientcard?id=${patientinfo}`
             );
             settotinfo(response.data);
             const f = new Date(response.data.DOB);
@@ -18,7 +18,12 @@ export default function PatientCard({ patientinfo }) {
     }, []);
     return (
         totinfo && (
-            <View className='flex justify-around mt-2 items-center bg-zinc-300 rounded-3xl w-[85%] h-fit'>
+            <TouchableOpacity
+                className='flex justify-around mt-2 items-center bg-zinc-300 rounded-3xl w-[85%] h-fit'
+                onPress={() =>
+                    navigation.navigate('Patient', { info: totinfo })
+                }
+            >
                 <View className='flex-row w-[95%] h-fit ml-7 mt-2 mb-1'>
                     <Text className='text-xs'>Name:- {totinfo.name}</Text>
                 </View>
@@ -37,7 +42,7 @@ export default function PatientCard({ patientinfo }) {
                         Unverified Reports:-{totinfo.unverifiedreports.length}
                     </Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     );
 }

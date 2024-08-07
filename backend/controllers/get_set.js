@@ -3,7 +3,7 @@ const { report, patient, oldAgeHome, doctor } = require('../Schema.js');
 
 const getReport = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.query.id;
         const reportInfo = await report.findOne({ _id: id });
         res.json(reportInfo);
     } catch (error) {
@@ -46,6 +46,7 @@ const setPatient = async (req, res) => {
             name: info.name,
             DOB: info.DOB,
             chronics: info.chronics,
+            Medications:info.Medications,
             bloodGroup: info.bloodGroup,
             gender: info.gender,
             phone: oldAgeHomeInfo.contact,
@@ -67,9 +68,15 @@ const getPatient = async (req, res) => {
     res.json(patientInfo);
 };
 
+const getPatientCard = async (req, res) => {
+    const id = req.query.id;
+    const patientInfo = await patient.findOne({ _id: id }).select("name DOB gender bloodGroup verifiedreports unverifiedreports",);
+    res.json(patientInfo);
+};
+
 const getPatients = async (req, res) => {
     try {
-        const patients = await oldAgeHome.findOne({_id:req.session.oldageid}).select('patients'); // TODO: add session oldagehome query
+        const patients = await oldAgeHome.findOne({_id:req.session.oldageid}).select('patients');
         res.json(patients.patients);
     } catch (error) {
         console.error(error);
@@ -80,7 +87,6 @@ const getPatients = async (req, res) => {
 const getOldageHomeInfo = async (req, res) => {
     try {
         const id = req.query.id;
-        console.log(id)
         const oldAgeHomeDetails = await oldAgeHome.findOne({_id:id}).select({"key":1,"doctors":1});
         res.json(oldAgeHomeDetails);
     } catch (error) {
@@ -94,6 +100,7 @@ const getOldageHomeInfo = async (req, res) => {
 module.exports = {
     getReport,
     getPatient,
+    getPatientCard,
     getReports,
     setPatient,
     getPatients,

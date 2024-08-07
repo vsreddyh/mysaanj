@@ -16,7 +16,7 @@ export default function CreatePatient({ navigation }) {
         DOB: new Date(),
         chronics: '',
         bloodGroup: 'AB+',
-        gender: 'Male',
+        gender: 'M',
         Medications: '',
         weight: '',
     });
@@ -25,7 +25,7 @@ export default function CreatePatient({ navigation }) {
             try {
                 const savepatient = async () => {
                     const response = await axios.post(
-                        'http://192.168.147.1:3000/en/setPatient',
+                        'http://192.168.29.80:3000/en/setPatient',
                         info
                     );
                     return response.data;
@@ -44,7 +44,9 @@ export default function CreatePatient({ navigation }) {
             ref={drawer}
             drawerWidth={(2 * width) / 3}
             drawerPosition={'left'}
-            renderNavigationView={() => <CSidebar drawer={drawer} />}
+            renderNavigationView={() => (
+                <CSidebar drawer={drawer} navigation={navigation} />
+            )}
         >
             <Searchbar2
                 drawer={drawer}
