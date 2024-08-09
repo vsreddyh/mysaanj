@@ -9,7 +9,7 @@ const logincaretaker = (req, res) => {
     });
 };
 const logindoctor = (req, res) => {
-    req.session.oldageid = '6687cc90dfb46fdd2abb5006';
+    req.session.oldageid = '66b60499a3cdb6e14042993c';
     req.session.name = 'Keshav';
     req.session.type = 'Doctor';
     res.json({
@@ -33,12 +33,13 @@ const checksession = (req, res) => {
         res.error(e);
     }
 };
-const deletesession=(req,res)=>{
+const deletesession = (req, res) => {
     req.session.destroy();
-    res.json(true)
-}
+    res.json(true);
+};
 module.exports = {
     logincaretaker,
     checksession,
     deletesession,
+    logindoctor
 };

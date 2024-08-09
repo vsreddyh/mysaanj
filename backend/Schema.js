@@ -41,8 +41,7 @@ reportSchema = new mongoose.Schema({
 
 doctorSchema = new mongoose.Schema({
     name: String,
-    specialization: String,
-    caretaker: String,
+    caretaker: Array,
 });
 
 const patient = mongoose.model('patient', patientSchema);
