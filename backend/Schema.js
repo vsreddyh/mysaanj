@@ -27,6 +27,8 @@ reportSchema = new mongoose.Schema({
     patient: String,
     patientId: ObjectId,
     doctor: String,
+    oldAgeHomeName:String,
+    oldAgeHomeId:ObjectId,
     file: ObjectId,
     dateOfReport: Date,
     valuesFromReport: Object,

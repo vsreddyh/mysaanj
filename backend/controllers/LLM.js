@@ -255,6 +255,8 @@ const uploadpdf = async (req, res) => {
             a.specialistReq = analysisjson['specialist'];
             a.patient = name;
             a.patientId = patientId;
+            a.oldAgeHomeId=req.session.oldageid;
+            a.oldAgeHomeName = req.session.name;
             a.file = fileId;
             a.valuesFromReport = jsonObject;
             a.dateOfReport = new Date();

@@ -27,7 +27,11 @@ const count = async (req, res) => {
 
 const getReports = async (req, res) => {
     try {
-        const reports = await report.find();
+        const doctorID = req.session.oldageid;
+        let caretakers = await doctor.findOne({_id:doctorID}).select("caretaker -_id");
+        caretakers=caretakers.caretaker
+        console.log(caretakers)
+        const reports = await report.find({oldAgeHomeId:{ $in: caretakers }}).sort({dateOfReport:-1}).select("patient severity dateOfReport oldAgeHomeName -_id")
         res.json(reports);
     } catch (error) {
         console.log(error);
@@ -87,7 +91,7 @@ const getPatients = async (req, res) => {
 const getOldageHomeInfo = async (req, res) => {
     try {
         const id = req.query.id;
-        const oldAgeHomeDetails = await oldAgeHome.findOne({_id:id}).select({"key":1,"doctors":1});
+        const oldAgeHomeDetails = await oldAgeHome.findOne({_id:id}).select({"key":1,"doctors":1,"name":1});
         res.json(oldAgeHomeDetails);
     } catch (error) {
         console.error(error);
@@ -96,7 +100,41 @@ const getOldageHomeInfo = async (req, res) => {
         });
     }
 };
+const getDoctorInfo = async (req, res) => {
+    try {
+        const id = req.query.id;
+        console.log(id)
+        const DoctorDetails = await doctor.findOne({_id:id});
+        res.json(DoctorDetails);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: 'Failed to retrieve old age home details',
+        });
+    }
+};
 
+const addkey = async (req,res)=>{
+    try{
+        const {key} = req.body;
+        console.log(key)
+        const a = req.session.oldageid
+        let doc= await doctor.findOne({_id:a});
+        const x = doc.caretaker;
+        console.log(x)
+        const id = await oldAgeHome.findOne({key:key});
+        console.log(id)
+        x.push(id._id.toString())
+        doc.caretaker=x;
+        doc.save();
+        res.json("success");
+    }
+    catch(error){
+        res.status(500).json({
+            error: 'Failed to add key',
+        });
+    }
+}
 module.exports = {
     getReport,
     getPatient,
@@ -105,5 +143,7 @@ module.exports = {
     setPatient,
     getPatients,
     getOldageHomeInfo,
+    getDoctorInfo,
     count,
+    addkey
 };
