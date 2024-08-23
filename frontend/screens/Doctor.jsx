@@ -27,27 +27,36 @@ export default function Doctor({ navigation, route }) {
     const isFocused = useIsFocused();
     const drawer = useRef(null);
     const [list, setlist] = useState(null);
-    const [addkey,setaddkey]=useState(false);
+    const [addkey, setaddkey] = useState(false);
     useEffect(() => {
         async function getcurr() {
             const response1 = await axios.get(
-                'http://192.168.29.80:3000/en/getreports'
+                'http://192.168.43.1:3000/en/getreports'
             );
             setlist(response1.data);
         }
         getcurr();
-    }, [isFocused, refreshing]);
+    }, [isFocused, refreshing,setaddkey]);
     return (
         <DrawerLayoutAndroid
             ref={drawer}
             drawerWidth={(2 * width) / 3}
-            drawerPosition="left"
+            drawerPosition='left'
             renderNavigationView={() => (
-                <Dsidebar drawer={drawer} navigation={navigation} isFocused={isFocused} refreshing={refreshing}/>
+                <Dsidebar
+                    drawer={drawer}
+                    navigation={navigation}
+                    isFocused={isFocused}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
             )}
         >
-            
-            <Searchbar4 drawer={drawer} navigation={navigation} setaddkey={setaddkey} />
+            <Searchbar4
+                drawer={drawer}
+                navigation={navigation}
+                setaddkey={setaddkey}
+            />
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
                 className='w-screen'
@@ -76,7 +85,7 @@ export default function Doctor({ navigation, route }) {
                 )}
             </ScrollView>
             <Chatbot />
-            {addkey && <Addkey setaddkey={setaddkey}/>}
+            {addkey && <Addkey setaddkey={setaddkey} />}
         </DrawerLayoutAndroid>
     );
 }

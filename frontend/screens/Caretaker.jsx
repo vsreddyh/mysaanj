@@ -29,7 +29,7 @@ export default function Caretaker({ navigation, route }) {
     useEffect(() => {
         async function getcurr() {
             const response1 = await axios.get(
-                'http://192.168.29.80:3000/en/getpatients'
+                'http://192.168.43.1:3000/en/getpatients'
             );
             setlist(response1.data);
         }
@@ -41,7 +41,10 @@ export default function Caretaker({ navigation, route }) {
             drawerWidth={(2 * width) / 3}
             drawerPosition={'left'}
             renderNavigationView={() => (
-                <CSidebar drawer={drawer} navigation={navigation} />
+                <CSidebar drawer={drawer} navigation={navigation} 
+                isFocused={isFocused}
+                refreshing={refreshing}
+                onRefresh={onRefresh}/>
             )}
         >
             <Searchbar1 drawer={drawer} navigation={navigation} />

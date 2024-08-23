@@ -7,32 +7,41 @@ import {
     TouchableWithoutFeedback,
 } from 'react-native';
 import axios from 'axios';
-export default function Dsidebar({ drawer, navigation,isFocused,refreshing }) {
+export default function Dsidebar({
+    drawer,
+    navigation,
+    isFocused,
+    refreshing,
+    onRefresh
+}) {
     const [dropdown, setDropdown] = useState(false);
     const [doctor, setdoctor] = useState(null);
     const [ddetails, setddetails] = useState(null);
+    const [refresh,setrefresh]=useState(false);
     useEffect(() => {
         async function x() {
             const response1 = await axios.get(
-                'http://192.168.29.80:3000/en/checksession'
+                'http://192.168.43.1:3000/en/checksession'
             );
             setddetails(response1.data);
             const response = await axios.get(
-                `http://192.168.29.80:3000/en/getdoctorinfo?id=${response1.data.oldageid}`
+                `http://192.168.43.1:3000/en/getdoctorinfo?id=${response1.data.oldageid}`
             );
             setdoctor(response.data);
         }
         x();
-    }, [isFocused,refreshing]);
-    async function getcaretaker(c) {
-        const response = await axios.get(
-            `http://192.168.29.80:3000/en/getoldagehomeinfo?id=${c}`
-        );
-        return response.data.name;
+    }, [isFocused, refreshing,refresh]);
+    async function deletekey(x){
+        response=await axios.post("http://192.168.43.1:3000/en/deletekey",{id:x});
+        if(response.data="done"){
+            setrefresh(!refresh)
+            onRefresh();
+        }
     }
+
     async function logout() {
         response = await axios.post(
-            'http://192.168.29.80:3000/en/deletesession'
+            'http://192.168.43.1:3000/en/deletesession'
         );
         if (response.data === true) {
             navigation.navigate('Home');
@@ -55,7 +64,7 @@ export default function Dsidebar({ drawer, navigation,isFocused,refreshing }) {
                         </TouchableOpacity>
                         <View className='flex justify-center items-center h-[75%]'>
                             <Text className='text-xl font-semibold'>
-                                {ddetails.name}
+                                Dr.{ddetails.name}
                             </Text>
                         </View>
                     </View>
@@ -84,7 +93,7 @@ export default function Dsidebar({ drawer, navigation,isFocused,refreshing }) {
                                         />
                                     </View>
                                     <Text className='text-base pl-1 text-white'>
-                                        Manage Doctors
+                                        Manage Old Age Homes
                                     </Text>
                                     <View className='flex items-center justify-center h-full w-[20%]'>
                                         {dropdown ? (
@@ -104,18 +113,20 @@ export default function Dsidebar({ drawer, navigation,isFocused,refreshing }) {
                         </View>
                         {dropdown && doctor && (
                             <View className='flex h-fit ml-6 w-full'>
-                                {doctor.caretaker.map((c,index) => (
+                                {doctor.caretaker.map((c, index) => (
                                     <View
                                         key={index}
                                         className='flex-row items-center h-fit w-[90%]'
                                     >
                                         <Text className='text-base text-white'>
-                                            {getcaretaker(c)}
+                                            {c.name}
                                         </Text>
+                                        <TouchableWithoutFeedback onPress={()=>deletekey(c.id)}>
                                         <Image
                                             source={require('../assets/delete.png')}
                                             className='absolute right-6  h-5 w-5'
                                         />
+                                        </TouchableWithoutFeedback>
                                     </View>
                                 ))}
                             </View>

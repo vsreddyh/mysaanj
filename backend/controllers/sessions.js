@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
+
 const logincaretaker = (req, res) => {
-    req.session.oldageid = '6687cc90dfb46fdd2abb5006';
+    req.session.oldageid = new mongoose.Types.ObjectId('6687cc90dfb46fdd2abb5006');
     req.session.name = 'Keshav old age homes';
     req.session.type = 'Caretaker';
     res.json({
@@ -9,7 +11,7 @@ const logincaretaker = (req, res) => {
     });
 };
 const logindoctor = (req, res) => {
-    req.session.oldageid = '66b60499a3cdb6e14042993c';
+    req.session.oldageid = new mongoose.Types.ObjectId('66b60499a3cdb6e14042993c');
     req.session.name = 'Keshav';
     req.session.type = 'Doctor';
     res.json({

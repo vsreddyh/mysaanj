@@ -7,7 +7,7 @@ export default function ReportCard({ navigation, reportid }) {
     useEffect(() => {
         async function f1(reportid) {
             const response = await axios.get(
-                `http://192.168.29.80:3000/en/getreport?id=${reportid}`
+                `http://192.168.43.1:3000/en/getreport?id=${reportid}`
             );
             setdata(response.data);
             function formatDate(dat) {

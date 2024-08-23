@@ -8,7 +8,7 @@ export default function PatientCard({ patientinfo, navigation }) {
     useEffect(() => {
         async function x() {
             const response = await axios.get(
-                `http://192.168.29.80:3000/en/getpatientcard?id=${patientinfo}`
+                `http://192.168.43.1:3000/en/getpatientcard?id=${patientinfo}`
             );
             settotinfo(response.data);
             const f = new Date(response.data.DOB);

@@ -11,7 +11,7 @@ export default function ViewReport({ navigation, route }) {
     useEffect(() => {
         async function f1() {
             const response = await axios.get(
-                `http://192.168.29.80:3000/en/getpatient?id=${data.patientId}`
+                `http://192.168.43.1:3000/en/getpatient?id=${data.patientId}`
             );
             setpatient(response.data);
             const D = new Date();
@@ -28,9 +28,11 @@ export default function ViewReport({ navigation, route }) {
                 className='w-screen pl-2'
             >
                 <View className='w-full ml-5 mt-2'>
-                    <TouchableOpacity onPress={() =>
-                    navigation.navigate('Patient', { info: patient })
-                }>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate('Patient', { info: patient })
+                        }
+                    >
                         <Image source={require('../assets/leftarrow.png')} />
                     </TouchableOpacity>
                 </View>

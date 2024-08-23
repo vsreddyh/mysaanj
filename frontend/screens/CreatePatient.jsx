@@ -25,7 +25,7 @@ export default function CreatePatient({ navigation }) {
             try {
                 const savepatient = async () => {
                     const response = await axios.post(
-                        'http://192.168.29.80:3000/en/setPatient',
+                        'http://192.168.43.1:3000/en/setPatient',
                         info
                     );
                     return response.data;

@@ -26,7 +26,7 @@ export default function PatientInfo({ navigation, info }) {
     useEffect(() => {
         async function function1() {
             const response = await axios.get(
-                `http://192.168.29.80:3000/en/getpatient?id=${info._id}`
+                `http://192.168.43.1:3000/en/getpatient?id=${info._id}`
             );
             setdata(response.data);
             const x = new Date();

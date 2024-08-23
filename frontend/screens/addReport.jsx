@@ -62,7 +62,7 @@ export default function NewReport({ navigation, route }) {
     const submitreport = async () => {
         setloading(true);
         const response = await axios.post(
-            'http://192.168.29.80:3000/en/upload',
+            'http://192.168.43.1:3000/en/upload',
             {
                 file: base64,
                 filename: 'Report',
