@@ -4,10 +4,11 @@ import ReportCard from './ReportCard';
 import axios from 'axios';
 export default function ViewReport({ navigation, route }) {
     const { data } = route.params;
-    const [patient, setpatient] = useState(true);
+    const [patient, setpatient] = useState(null);
     const [DOB, setDOB] = useState(null);
-    const [showprecautions, setshowprecautions] = useState(true);
-    const [showprescription, setprescription] = useState(true);
+    const [showprecautions, setshowprecautions] = useState(false);
+    const [showprescription, setprescription] = useState(false);
+    const [showpossiblediseases, setshowpossiblediseases] = useState(false);
     useEffect(() => {
         async function f1() {
             const response = await axios.get(
@@ -53,6 +54,17 @@ export default function ViewReport({ navigation, route }) {
                 <View className='w-[75%] mt-4'>
                     <Text className='text-lg'>Severity:- {data.severity}</Text>
                 </View>
+                <TouchableOpacity className="h-20 flex justify-center items-center bg-zinc-300 w-[80%] rounded-2xl" onPress={()=>navigation.navigate('Pdf',{fileId:data.file})}>
+                    <Text>Click here to view the Medical Report</Text>
+                </TouchableOpacity>
+                <View className='w-full mt-4 ml-24'>
+                    <Text className='text-xl font-medium'>Summary</Text>
+                </View>
+                {data && (
+                    <View className='w-[75%] mt-3 px-2'>
+                        <Text className='text-base'>{data.summary}</Text>
+                    </View>
+                )}
                 <View className='w-full flex-row items-center justify-around mt-4'>
                     <Text className='text-xl'>Precautions</Text>
                     <TouchableOpacity
@@ -73,6 +85,34 @@ export default function ViewReport({ navigation, route }) {
                         {data.precautions.map((precaution, index) => (
                             <Text key={index} className='text-base'>
                                 {precaution}
+                            </Text>
+                        ))}
+                    </View>
+                )}
+                <View className='w-full flex-row items-center justify-around mt-4'>
+                    <Text className='text-xl font-medium'>
+                        Possible Diseases
+                    </Text>
+                    <TouchableOpacity
+                        className='h-fit w-fit'
+                        onPress={() =>
+                            setshowpossiblediseases(!showpossiblediseases)
+                        }
+                    >
+                        <Image
+                            source={
+                                showpossiblediseases
+                                    ? require('../assets/b_arrow_up.png')
+                                    : require('../assets/b_arrow_down.png')
+                            }
+                        />
+                    </TouchableOpacity>
+                </View>
+                {showpossiblediseases && (
+                    <View className='w-[75%] mt-3 px-2'>
+                        {data.possibleDiseases.map((disease, index) => (
+                            <Text key={index} className='text-base'>
+                                {disease}
                             </Text>
                         ))}
                     </View>

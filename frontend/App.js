@@ -12,6 +12,7 @@ import NewReport from './screens/addReport';
 import Report from './screens/Report';
 import Doctor from './screens/Doctor';
 import ReviewReport from './screens/ReviewReport';
+import PDF from './components/Pdf';
 NativeWindStyleSheet.setOutput({
     default: 'native',
 });
@@ -87,8 +88,8 @@ export default function App() {
                     options={{ animation: 'none' }}
                 />
                 <Stack.Screen name='Report' component={Report} />
-
                 <Stack.Screen name='DReport' component={ReviewReport} />
+                <Stack.Screen name='Pdf' component={PDF} />
             </Stack.Navigator>
         </NavigationContainer>
     );

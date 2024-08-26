@@ -282,12 +282,11 @@ const pdfid = async (req, res) => {
     const databaseName = 'Saanjh';
     const client = new MongoClient(mongoURI);
     let db;
+    const url = process.env.MONGO_URL
     client.connect();
     db = client.db(databaseName);
     try {
-        const conn = mongoose.createConnection(
-            'mongodb+srv://Project:Florencemidhebaramvesam@project.tbx2krn.mongodb.net/Saanjh'
-        );
+        const conn = mongoose.createConnection(url);
         let gfs;
         conn.once('open', () => {
             gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -295,8 +294,8 @@ const pdfid = async (req, res) => {
             });
         });
 
-        const fileId = new mongoose.Types.ObjectId(req.params.id);
-
+        const fileId = new mongoose.Types.ObjectId(req.query.id);
+        console.log(fileId,req.query.id)
         if (!gfs) {
             conn.once('open', () => {
                 gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -315,4 +314,4 @@ const pdfid = async (req, res) => {
     }
 };
 
-module.exports = { uploadpdf };
+module.exports = { uploadpdf,pdfid };

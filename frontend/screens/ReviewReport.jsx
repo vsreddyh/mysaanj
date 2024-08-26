@@ -87,6 +87,17 @@ export default function ReviewReport({ navigation, route }) {
                         Severity:- {reportdata.severity}
                     </Text>
                 </View>
+                <TouchableOpacity className="h-20 flex justify-center items-center bg-zinc-300 w-[80%] rounded-2xl" onPress={()=>navigation.navigate('Pdf',{fileId:reportdata.file})}>
+                    <Text>Click here to view the Medical Report</Text>
+                </TouchableOpacity>
+                <View className='w-full mt-4 ml-24'>
+                    <Text className='text-xl font-medium'>Summary</Text>
+                </View>
+                {reportdata && (
+                    <View className='w-[75%] mt-3 px-2'>
+                        <Text className='text-base'>{reportdata.summary}</Text>
+                    </View>
+                )}
                 <View className='w-full flex-row items-center justify-around mt-4'>
                     <Text className='text-xl font-medium'>Precautions</Text>
                     <TouchableOpacity
@@ -137,14 +148,6 @@ export default function ReviewReport({ navigation, route }) {
                                 {disease}
                             </Text>
                         ))}
-                    </View>
-                )}
-                <View className='w-full mt-4 ml-24'>
-                    <Text className='text-xl font-medium'>Summary</Text>
-                </View>
-                {reportdata && (
-                    <View className='w-[75%] mt-3 px-2'>
-                        <Text className='text-base'>{reportdata.summary}</Text>
                     </View>
                 )}
                 <View className='w-full mt-4 ml-24'>
