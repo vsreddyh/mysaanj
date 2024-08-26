@@ -19,7 +19,9 @@
       "bundleIdentifier": "com.anonymous.frontend"
     },
     "android": {
-      "permissions": ["android.permission."],
+      "permissions": [
+        "android.permission."
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

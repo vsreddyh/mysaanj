@@ -15,7 +15,7 @@ const {
     HarmCategory,
     HarmBlockThreshold,
 } = require('@google/generative-ai');
-
+const { GoogleAIFileManager } = require("@google/generative-ai/server");
 const safety_settings = [
     {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -43,6 +43,7 @@ const uploadpdf = async (req, res) => {
     let db;
     client.connect();
     db = client.db(databaseName);
+    const fileManager = new GoogleAIFileManager();
     try {
         if (!db) {
             throw new Error('MongoDB connection not established.');
@@ -258,7 +259,6 @@ const uploadpdf = async (req, res) => {
             a.oldAgeHomeId=req.session.oldageid;
             a.oldAgeHomeName = req.session.name;
             a.file = fileId;
-            a.valuesFromReport = jsonObject;
             a.dateOfReport = new Date();
             await a.save();
             return true;

@@ -4,7 +4,8 @@ const { report, patient, oldAgeHome, doctor } = require('../Schema.js');
 
 const getReport = async (req, res) => {
     try {
-        const id = req.query.id;
+        let id = req.query.id;
+        id=new ObjectId(id);
         const reportInfo = await report.findOne({ _id: id });
         res.json(reportInfo);
     } catch (error) {
@@ -39,9 +40,9 @@ const getReports = async (req, res) => {
         }
         console.log(caretakers,arr);
         const reports = await report
-            .find({ oldAgeHomeId: { $in: arr } })
+            .find({ oldAgeHomeId: { $in: arr },doctorNotes:'' })
             .sort({ dateOfReport: -1 })
-            .select('patient severity dateOfReport oldAgeHomeName -_id');
+            .select('patient severity dateOfReport oldAgeHomeName patientId');
         res.json(reports);
     } catch (error) {
         console.log(error);
@@ -162,7 +163,7 @@ const addkey = async (req, res) => {
 };
 const deletekey = async(req,res)=>{
     let {id} = req.body;
-    id= new mongoose.Types.ObjectId(id);
+    id= new ObjectId(id);
     console.log("furfur",id)
     if(req.session.type=="Caretaker"){
         let oah = await oldAgeHome.findOne({_id:req.session.oldageid});
@@ -195,6 +196,22 @@ const deletekey = async(req,res)=>{
     }
     res.json("done");
 }
+const reviewreport = async(req,res)=>{
+    let {id,note}=req.body;
+    id=new ObjectId(id);
+    let rep = await report.findOne({_id:id});
+    console.log(id,note,rep)
+    rep.doctorNotes=note;
+    await rep.save();
+    let patient1 = await patient.findOne({_id:rep.patientId});
+    const index = patient1.unverifiedreports.indexOf(id);
+    if (index > -1) {
+        patient1.unverifiedreports.splice(index, 1);
+    }
+    patient1.verifiedreports.push(id);
+    patient1.save();
+    res.json("reviewed")
+}
 module.exports = {
     getReport,
     getPatient,
@@ -207,4 +224,5 @@ module.exports = {
     count,
     addkey,
     deletekey,
+    reviewreport
 };

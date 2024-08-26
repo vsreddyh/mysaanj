@@ -27,7 +27,7 @@ export default function ReportCardD({ navigation, report }) {
             <TouchableOpacity
                 className='flex justify-around mt-2 items-center bg-zinc-300 rounded-3xl w-[85%] h-fit'
                 onPress={() =>
-                    navigation.navigate('Report', { data: data })
+                    navigation.navigate('DReport', { data: data })
                 }
             >
                 <View className='flex-row w-[95%] h-fit ml-7 mt-2 mb-1'>
