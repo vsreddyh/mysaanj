@@ -21,11 +21,25 @@ export default function NewReport({ navigation, route }) {
         if (!uri) {
             throw new Error('Invalid file URI provided');
         }
+
         console.log(uri);
+
         try {
-            const base64String = await FileSystem.readAsStringAsync(uri, {
+            // Define the local path where you want to copy the file
+            const fileName = uri.split('/').pop(); // Extracts the file name from the URI
+            const destUri = `${FileSystem.documentDirectory}${fileName}`;
+
+            // Copy the file from the content URI to the app's local file system
+            await FileSystem.copyAsync({
+                from: uri,
+                to: destUri,
+            });
+
+            // Read the file and convert it to Base64
+            const base64String = await FileSystem.readAsStringAsync(destUri, {
                 encoding: FileSystem.EncodingType.Base64,
             });
+
             return base64String;
         } catch (error) {
             console.error('Error converting file to Base64:', error);
@@ -33,10 +47,6 @@ export default function NewReport({ navigation, route }) {
     };
 
     const pickDocument = async () => {
-        // const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
-        // if (status !== 'granted') {
-        //     alert('Sorry, we need storage permissions to access files');
-        // }
         let result;
         const options = {
             type: 'application/pdf',
@@ -45,6 +55,7 @@ export default function NewReport({ navigation, route }) {
 
         try {
             result = await DocumentPicker.getDocumentAsync(options);
+            console.log(result);
         } catch (err) {
             console.error('Error picking document:', err);
         }
