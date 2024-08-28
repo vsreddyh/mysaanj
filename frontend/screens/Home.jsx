@@ -15,16 +15,10 @@ const { width, height } = Dimensions.get('window');
 export default function Home({ navigation }) {
     const [count, setCount] = useState(null);
     async function Authenticate() {
-        const response = await axios.post(
-            'http://192.168.43.1:3000/en/logincaretaker'
-        );
-        navigation.navigate('Caretaker');
+        navigation.navigate('CaretakerSignIn');
     }
     async function DAuthenticate() {
-        const response = await axios.post(
-            'http://192.168.43.1:3000/en/logindoctor'
-        );
-        navigation.navigate('Doctor');
+        navigation.navigate('DoctorSignIn');
     }
     useEffect(() => {
         const getCount = async () => {

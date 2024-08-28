@@ -13,6 +13,8 @@ import Report from './screens/Report';
 import Doctor from './screens/Doctor';
 import ReviewReport from './screens/ReviewReport';
 import PDF from './components/Pdf';
+import CaretakerSigIn from './screens/CaretakerSIgnIn';
+import DoctorSignIn from './screens/DoctorSignIn';
 NativeWindStyleSheet.setOutput({
     default: 'native',
 });
@@ -90,6 +92,8 @@ export default function App() {
                 <Stack.Screen name='Report' component={Report} />
                 <Stack.Screen name='DReport' component={ReviewReport} />
                 <Stack.Screen name='Pdf' component={PDF} />
+                <Stack.Screen name="csignin" component={CaretakerSigIn}/>
+                <Stack.Screen name="dsignin" component={DoctorSignIn}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

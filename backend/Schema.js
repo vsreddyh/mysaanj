@@ -15,8 +15,7 @@ patientSchema = new mongoose.Schema({
 });
 oldAgeHomeSchema = new mongoose.Schema({
     name: String,
-    email: String,
-    password: String,
+    uid:String,
     doctors: Array,
     key: String,
     patients: Array,
@@ -43,6 +42,7 @@ reportSchema = new mongoose.Schema({
 
 doctorSchema = new mongoose.Schema({
     name: String,
+    uid:String,
     caretaker: Array,
 });
 

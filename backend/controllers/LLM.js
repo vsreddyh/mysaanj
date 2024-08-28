@@ -235,6 +235,7 @@ const uploadpdf = async (req, res) => {
             a.oldAgeHomeId=req.session.oldageid;
             a.oldAgeHomeName = req.session.name;
             a.file = fileId;
+            a.doctorNotes="";
             a.dateOfReport = new Date();
             await a.save();
             return true;

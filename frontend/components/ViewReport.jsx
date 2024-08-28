@@ -117,7 +117,7 @@ export default function ViewReport({ navigation, route }) {
                         ))}
                     </View>
                 )}
-                {data.doctorNotes && (
+                {data.doctorNotes!=="" && (
                     <>
                         <View className='w-full flex-row items-center justify-around mt-4'>
                             <Text className='text-xl'>Prescription</Text>
