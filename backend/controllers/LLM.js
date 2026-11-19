@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const fs = require('fs');
 const { report, patient } = require('../Schema.js');
+const { findAccessiblePatient, accessibleHomeIds } = require('./access');
 const { MongoClient, ObjectId, GridFSBucket } = require('mongodb');
 const Pdf = require('pdf-parse');
 const multer = require('multer');
@@ -48,7 +49,20 @@ const uploadpdf = async (req, res) => {
         if (!db) {
             throw new Error('MongoDB connection not established.');
         }
-        const { file, filename, patientId, name } = req.body;
+        const { file, filename, patientId } = req.body;
+
+        if (!file || !filename) {
+            return res.status(400).json({ error: 'Missing file or filename' });
+        }
+
+        // Never trust the patient id from the client without checking that it
+        // belongs to the caller's old-age home.
+        const access = await findAccessiblePatient(req.session, patientId);
+        if (!access) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        const patientName = access.patient.name;
+        const home = access.home;
 
         const uploadFile = async (data, name) => {
             const buffer = Buffer.from(data, 'base64');
@@ -156,13 +170,13 @@ const uploadpdf = async (req, res) => {
         };
         const fileDetails = file ? await uploadFile(file, filename) : null;
         if (fileDetails.fileId === null) {
-            res.json(false);
+            return res.json(false);
         }
         const fileId = fileDetails.fileId;
         const jsonObject = fileDetails.jsonObject;
 
         console.log('hi');
-        async function function2(fileId, jsonObject, patientId, name) {
+        async function function2(fileId, jsonObject, patientId, name, home) {
             let report1 = new report({});
             report1 = await report1.save();
             const id = report1._id;
@@ -232,8 +246,8 @@ const uploadpdf = async (req, res) => {
             a.specialistReq = analysisjson['specialist'];
             a.patient = name;
             a.patientId = patientId;
-            a.oldAgeHomeId=req.session.oldageid;
-            a.oldAgeHomeName = req.session.name;
+            a.oldAgeHomeId = home._id;
+            a.oldAgeHomeName = home.name;
             a.file = fileId;
             a.dateOfReport = new Date();
             await a.save();
@@ -243,7 +257,8 @@ const uploadpdf = async (req, res) => {
             fileId,
             jsonObject,
             patientId,
-            name
+            patientName,
+            home
         );
         console.log('analysis_response ', analysis_response);
         return res.json({ data: true });
@@ -256,37 +271,46 @@ const uploadpdf = async (req, res) => {
 const pdfid = async (req, res) => {
     const mongoURI = process.env.MONGO;
     const databaseName = 'Saanjh';
-    const client = new MongoClient(mongoURI);
-    let db;
-    const url = process.env.MONGO_URL
-    client.connect();
-    db = client.db(databaseName);
+    let client;
     try {
-        const conn = mongoose.createConnection(url);
-        let gfs;
-        conn.once('open', () => {
-            gfs = new mongoose.mongo.GridFSBucket(conn.db, {
-                bucketName: 'fs',
-            });
+        if (!mongoose.Types.ObjectId.isValid(req.query.id)) {
+            return res.status(404).send('Not found');
+        }
+        const fileId = new mongoose.Types.ObjectId(req.query.id);
+
+        // PDFs are attached to a report; only serve files whose report belongs
+        // to one of the caller's old-age homes.
+        const reportInfo = await report.findOne({ file: fileId });
+        if (!reportInfo) {
+            return res.status(404).send('Not found');
+        }
+        const homeIds = await accessibleHomeIds(req.session);
+        if (!homeIds.includes(String(reportInfo.oldAgeHomeId))) {
+            return res.status(404).send('Not found');
+        }
+
+        client = new MongoClient(mongoURI);
+        await client.connect();
+        const db = client.db(databaseName);
+        const gfs = new GridFSBucket(db, { bucketName: 'fs' });
+
+        res.set('Content-Type', 'application/pdf');
+        res.on('close', () => {
+            client.close().catch(() => {});
         });
 
-        const fileId = new mongoose.Types.ObjectId(req.query.id);
-        console.log(fileId,req.query.id)
-        if (!gfs) {
-            conn.once('open', () => {
-                gfs = new mongoose.mongo.GridFSBucket(conn.db, {
-                    bucketName: 'fs',
-                });
-                const readStream = gfs.openDownloadStream(fileId);
-                res.set('Content-Type', 'application/pdf');
-                readStream.pipe(res);
-            });
-        } else {
-            gfs.openDownloadStream(fileId).pipe(res);
-        }
+        const readStream = gfs.openDownloadStream(fileId);
+        readStream.on('error', (error) => {
+            console.error(error);
+            if (!res.headersSent) res.status(404).send('Not found');
+            else res.end();
+        });
+        readStream.pipe(res);
     } catch (err) {
         console.error(err);
-        return res.status(500).send('Internal server error');
+        if (client) await client.close().catch(() => {});
+        if (!res.headersSent) return res.status(500).send('Internal server error');
+        res.end();
     }
 };
 

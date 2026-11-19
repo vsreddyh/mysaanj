@@ -1,12 +1,21 @@
 const mongoose = require('mongoose');
-const {ObjectId} = require("mongodb")
 const { report, patient, oldAgeHome, doctor } = require('../Schema.js');
+const {
+    accessibleHomeIds,
+    accessibleHomeObjectIds,
+    isAccessibleHome,
+    findAccessiblePatient,
+    findAccessibleReport,
+} = require('./access');
+
+const uniqueIds = (values) => [...new Set(values.map(String))];
 
 const getReport = async (req, res) => {
     try {
-        let id = req.query.id;
-        id=new ObjectId(id);
-        const reportInfo = await report.findOne({ _id: id });
+        const reportInfo = await findAccessibleReport(req.session, req.query.id);
+        if (!reportInfo) {
+            return res.status(404).json({ error: 'Report not found' });
+        }
         res.json(reportInfo);
     } catch (error) {
         console.log(error);
@@ -29,18 +38,9 @@ const count = async (req, res) => {
 
 const getReports = async (req, res) => {
     try {
-        const doctorID = req.session.oldageid;
-        let caretakers = await doctor
-            .findOne({ _id: doctorID })
-            .select('caretaker -_id');
-        caretakers = caretakers.caretaker;
-        let arr=[];
-        for(x of caretakers){
-            arr.push(x.id);
-        }
-        console.log(caretakers,arr);
+        const homeIds = await accessibleHomeObjectIds(req.session);
         const reports = await report
-            .find({ oldAgeHomeId: { $in: arr },doctorNotes:'' })
+            .find({ oldAgeHomeId: { $in: homeIds }, doctorNotes: '' })
             .sort({ dateOfReport: -1 })
             .select('patient severity dateOfReport oldAgeHomeName patientId');
         res.json(reports);
@@ -52,11 +52,16 @@ const getReports = async (req, res) => {
 
 const setPatient = async (req, res) => {
     try {
-        let oid = req.session.oldageid;
-        const oldAgeHomeInfo = await oldAgeHome.findOne({ _id: oid });
+        if (req.session.type !== 'Caretaker') {
+            return res.status(403).json({ error: 'Caretaker session required' });
+        }
+        const oldAgeHomeInfo = await oldAgeHome.findOne({ _id: req.session.oldageid });
+        if (!oldAgeHomeInfo) {
+            return res.status(404).json({ error: 'Old age home not found' });
+        }
+
         const info = req.body;
         info.DOB = new Date(info.DOB);
-        console.log('a', info.DOB, typeof info.DOB);
         let newpatient = new patient({
             name: info.name,
             DOB: info.DOB,
@@ -69,7 +74,7 @@ const setPatient = async (req, res) => {
         });
         newpatient = await newpatient.save();
         oldAgeHomeInfo.patients.push(newpatient._id);
-        oldAgeHomeInfo.save();
+        await oldAgeHomeInfo.save();
         res.json(newpatient._id);
     } catch (error) {
         console.error(error);
@@ -78,25 +83,42 @@ const setPatient = async (req, res) => {
 };
 
 const getPatient = async (req, res) => {
-    const id = req.query.id;
-    const patientInfo = await patient.findOne({ _id: id });
-    res.json(patientInfo);
+    try {
+        const access = await findAccessiblePatient(req.session, req.query.id);
+        if (!access) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        res.json(access.patient);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve patient' });
+    }
 };
 
 const getPatientCard = async (req, res) => {
-    const id = req.query.id;
-    const patientInfo = await patient
-        .findOne({ _id: id })
-        .select('name DOB gender bloodGroup verifiedreports unverifiedreports');
-    res.json(patientInfo);
+    try {
+        const access = await findAccessiblePatient(req.session, req.query.id);
+        if (!access) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        const patientInfo = await patient
+            .findOne({ _id: access.patient._id })
+            .select('name DOB gender bloodGroup verifiedreports unverifiedreports');
+        res.json(patientInfo);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve patient' });
+    }
 };
 
 const getPatients = async (req, res) => {
     try {
-        const patients = await oldAgeHome
-            .findOne({ _id: req.session.oldageid })
-            .select('patients');
-        res.json(patients.patients);
+        const homeIds = await accessibleHomeObjectIds(req.session);
+        const homes = await oldAgeHome
+            .find({ _id: { $in: homeIds } })
+            .select('patients -_id');
+        const patientIds = uniqueIds(homes.flatMap((home) => home.patients || []));
+        res.json(patientIds.map((id) => new mongoose.Types.ObjectId(id)));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to retrieve patients' });
@@ -105,10 +127,20 @@ const getPatients = async (req, res) => {
 
 const getOldageHomeInfo = async (req, res) => {
     try {
-        const id = req.query.id;
+        const fallback = req.session.type === 'Caretaker' ? req.session.oldageid : null;
+        const id = req.query.id || fallback;
+        const homeIds = await accessibleHomeIds(req.session);
+
+        if (!isAccessibleHome(homeIds, id)) {
+            return res.status(404).json({ error: 'Old age home not found' });
+        }
+
         const oldAgeHomeDetails = await oldAgeHome
             .findOne({ _id: id })
             .select({ key: 1, doctors: 1, name: 1 });
+        if (!oldAgeHomeDetails) {
+            return res.status(404).json({ error: 'Old age home not found' });
+        }
         res.json(oldAgeHomeDetails);
     } catch (error) {
         console.error(error);
@@ -117,11 +149,30 @@ const getOldageHomeInfo = async (req, res) => {
         });
     }
 };
+
 const getDoctorInfo = async (req, res) => {
     try {
         const id = req.query.id;
-        console.log(id);
-        let DoctorDetails = await doctor.findOne({ _id: id });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(404).json({ error: 'Doctor not found' });
+        }
+
+        let DoctorDetails;
+        if (req.session.type === 'Doctor') {
+            if (String(id) !== String(req.session.oldageid)) {
+                return res.status(404).json({ error: 'Doctor not found' });
+            }
+            DoctorDetails = await doctor.findOne({ _id: id });
+        } else {
+            DoctorDetails = await doctor.findOne({
+                _id: id,
+                'caretaker.id': req.session.oldageid,
+            });
+        }
+
+        if (!DoctorDetails) {
+            return res.status(404).json({ error: 'Doctor not found' });
+        }
         res.json(DoctorDetails);
     } catch (error) {
         console.error(error);
@@ -130,88 +181,147 @@ const getDoctorInfo = async (req, res) => {
         });
     }
 };
+
 const addkey = async (req, res) => {
     try {
+        if (req.session.type !== 'Doctor') {
+            return res.status(403).json({ error: 'Doctor session required' });
+        }
         const { key } = req.body;
-        console.log(key);
-        const a = req.session.oldageid;
-        let doc = await doctor.findOne({ _id: a });
-        const x = doc.caretaker;
-        console.log(x);
-        let id = await oldAgeHome.findOne({ key: key });
-        if(!id){
-            res.json("fail");
+        if (!key) {
+            return res.status(400).json({ error: 'Missing key' });
         }
-        else{
-            console.log(id)
-            let x1 = id.doctors;
-            console.log(x1,"lol");
-            x1.push({name:req.session.name,id:req.session.oldageid});
-            id.doctors = x1;
-            id.save();
-            console.log(id);
-            x.push({id:id._id,name:id.name});
-            doc.caretaker = x;
-            doc.save();
-            res.json('success');
+
+        let doc = await doctor.findOne({ _id: req.session.oldageid });
+        if (!doc) {
+            return res.status(404).json({ error: 'Doctor not found' });
         }
+        let home = await oldAgeHome.findOne({ key: key });
+        if (!home) {
+            return res.json('fail');
+        }
+
+        const alreadyLinked = (doc.caretaker || []).some(
+            (entry) => String(entry.id) === String(home._id)
+        );
+        if (!alreadyLinked) {
+            home.doctors = home.doctors || [];
+            home.doctors.push({ name: req.session.name, id: req.session.oldageid });
+            await home.save();
+
+            doc.caretaker = doc.caretaker || [];
+            doc.caretaker.push({ id: home._id, name: home.name });
+            await doc.save();
+        }
+        res.json('success');
     } catch (error) {
         res.status(500).json({
             error: 'Failed to add key',
         });
     }
 };
-const deletekey = async(req,res)=>{
-    let {id} = req.body;
-    id= new ObjectId(id);
-    console.log("furfur",id)
-    if(req.session.type=="Caretaker"){
-        let oah = await oldAgeHome.findOne({_id:req.session.oldageid});
-        oah.doctors=oah.doctors.filter(function (letter) {
-            return !(letter.id.equals(id));
-        });
-        oah.save();
-        let doc = await doctor.findOne({_id:id})
-        doc.caretaker=doc.caretaker.filter(function(c){
-            return !(c.id.equals(req.session.oldageid));
-        })
-        doc.save();
+
+const deletekey = async (req, res) => {
+    try {
+        let { id } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid id' });
+        }
+
+        if (req.session.type === 'Caretaker') {
+            let oah = await oldAgeHome.findOne({ _id: req.session.oldageid });
+            if (!oah) {
+                return res.status(404).json({ error: 'Old age home not found' });
+            }
+            oah.doctors = (oah.doctors || []).filter(
+                (entry) => String(entry.id) !== String(id)
+            );
+            await oah.save();
+
+            let doc = await doctor.findOne({ _id: id });
+            if (doc) {
+                doc.caretaker = (doc.caretaker || []).filter(
+                    (entry) => String(entry.id) !== String(req.session.oldageid)
+                );
+                await doc.save();
+            }
+        } else if (req.session.type === 'Doctor') {
+            const doc = await doctor.findOne({ _id: req.session.oldageid });
+            if (!doc) {
+                return res.status(404).json({ error: 'Doctor not found' });
+            }
+            const linked = (doc.caretaker || []).some(
+                (entry) => String(entry.id) === String(id)
+            );
+            if (!linked) {
+                return res.status(404).json({ error: 'Old age home not found' });
+            }
+
+            let oah = await oldAgeHome.findOne({ _id: id });
+            if (oah) {
+                oah.doctors = (oah.doctors || []).filter(
+                    (entry) => String(entry.id) !== String(req.session.oldageid)
+                );
+                await oah.save();
+            }
+
+            doc.caretaker = (doc.caretaker || []).filter(
+                (entry) => String(entry.id) !== String(id)
+            );
+            await doc.save();
+        } else {
+            return res.status(403).json({ error: 'Unsupported session type' });
+        }
+
+        res.json('done');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to remove key' });
     }
-    else{
-        let oah = await oldAgeHome.findOne({_id:id});
-        console.log(oah.doctors)
-        oah.doctors=oah.doctors.filter(function (letter) {
-            return !(letter.id.equals(req.session.oldageid));
-        });
-        console.log(oah.doctors)
-        oah.save();
-        let doc = await doctor.findOne({_id:req.session.oldageid})
-        console.log(doc.caretaker)
-        doc.caretaker=doc.caretaker.filter(function(c){
-            console.log("yoyo",c.id.equals(id))
-            return !(c.id.equals(id));
-        })
-        console.log(doc.caretaker)
-        doc.save();
+};
+
+const reviewreport = async (req, res) => {
+    try {
+        if (req.session.type !== 'Doctor') {
+            return res.status(403).json({ error: 'Doctor session required' });
+        }
+
+        const { id, note } = req.body;
+        const rep = await findAccessibleReport(req.session, id);
+        if (!rep) {
+            return res.status(404).json({ error: 'Report not found' });
+        }
+
+        rep.doctorNotes = note;
+        await rep.save();
+
+        const patientInfo = await patient.findOne({ _id: rep.patientId });
+        if (patientInfo) {
+            const isUnverified = (patientInfo.unverifiedreports || []).some(
+                (reportId) => String(reportId) === String(rep._id)
+            );
+            if (isUnverified) {
+                patientInfo.unverifiedreports = patientInfo.unverifiedreports.filter(
+                    (reportId) => String(reportId) !== String(rep._id)
+                );
+            }
+            const isVerified = (patientInfo.verifiedreports || []).some(
+                (reportId) => String(reportId) === String(rep._id)
+            );
+            if (!isVerified) {
+                patientInfo.verifiedreports = patientInfo.verifiedreports || [];
+                patientInfo.verifiedreports.push(rep._id);
+            }
+            await patientInfo.save();
+        }
+
+        res.json('reviewed');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to review report' });
     }
-    res.json("done");
-}
-const reviewreport = async(req,res)=>{
-    let {id,note}=req.body;
-    id=new ObjectId(id);
-    let rep = await report.findOne({_id:id});
-    console.log(id,note,rep)
-    rep.doctorNotes=note;
-    await rep.save();
-    let patient1 = await patient.findOne({_id:rep.patientId});
-    const index = patient1.unverifiedreports.indexOf(id);
-    if (index > -1) {
-        patient1.unverifiedreports.splice(index, 1);
-    }
-    patient1.verifiedreports.push(id);
-    patient1.save();
-    res.json("reviewed")
-}
+};
+
 module.exports = {
     getReport,
     getPatient,
