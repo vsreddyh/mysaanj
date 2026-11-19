@@ -1,5 +1,25 @@
 const mongoose = require("mongoose");
 
+// The fixed IDs below are demo fixtures for the prototype. They are safe to
+// use locally, but must never be reachable in production: that would let any
+// caller mint a caretaker/doctor session.
+const demoLoginEnabled = () =>
+    process.env.NODE_ENV !== 'production' || process.env.DEMO_LOGIN === '1';
+
+const withDemoLogin = (handler) => (req, res, next) => {
+    if (!demoLoginEnabled()) {
+        return res.status(503).json({
+            error:
+                'Demo login is disabled. Configure real authentication, or set DEMO_LOGIN=1 for a local prototype.',
+        });
+    }
+    // Rotate the session id on login to avoid fixation.
+    req.session.regenerate((error) => {
+        if (error) return next(error);
+        return handler(req, res, next);
+    });
+};
+
 const logincaretaker = (req, res) => {
     req.session.oldageid = new mongoose.Types.ObjectId('6687cc90dfb46fdd2abb5006');
     req.session.name = 'Keshav old age homes';
@@ -40,8 +60,8 @@ const deletesession = (req, res) => {
     res.json(true);
 };
 module.exports = {
-    logincaretaker,
+    logincaretaker: withDemoLogin(logincaretaker),
     checksession,
     deletesession,
-    logindoctor
+    logindoctor: withDemoLogin(logindoctor)
 };

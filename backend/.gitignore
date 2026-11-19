@@ -35,4 +35,8 @@ out/
 
 # All of .svn for svn
 .svn/
+
+# Secrets: keep the template, ignore real values
 .env
+.env.*
+!.env.example
